@@ -155,11 +155,37 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PartsBinCore.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Helpers.h" />
     <ClInclude Include="PartsBinCore.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Shaders\BasicFragmentShader.frag">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">glslc.exe -o "%(RootDir)%(Directory)%(Filename).spv" "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">glslc.exe -o "%(RootDir)%(Directory)%(Filename).spv" "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">glslc.exe -o "%(RootDir)%(Directory)%(Filename).spv" "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">glslc.exe -o "%(RootDir)%(Directory)%(Filename).spv" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RootDir)%(Directory)%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RootDir)%(Directory)%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)%(Filename).spv</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="Shaders\BasicVertexShader.vert">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">glslc.exe -o "%(RootDir)%(Directory)%(Filename).spv" "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">glslc.exe -o "%(RootDir)%(Directory)%(Filename).spv" "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">glslc.exe -o "%(RootDir)%(Directory)%(Filename).spv" "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">glslc.exe -o "%(RootDir)%(Directory)%(Filename).spv" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RootDir)%(Directory)%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RootDir)%(Directory)%(Filename).spv</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RootDir)%(Directory)%(Filename).spv</Outputs>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

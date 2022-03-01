@@ -7,6 +7,8 @@
 #include <limits>
 #include <algorithm>
 
+#include "Helpers.h"
+
 //In the base C Vulkan API, any use of VkResult throws warnings due to unscoped enums, by C++ standards
 //I don't want to see it :///
 #pragma warning( push )
@@ -181,6 +183,7 @@ void PartsBinApp::initVulkan()
     createLogicalDevice();
     createSwapChain();
     createImageViews();
+    createGraphicsPipeline();
 }
 
 void PartsBinApp::createSurface()
@@ -397,6 +400,16 @@ void PartsBinApp::createImageViews()
             throw std::runtime_error("failed to create image views!");
         }
     }
+
+}
+
+void PartsBinApp::createGraphicsPipeline()
+{
+    auto vertShaderCode = Helpers::readFile("shaders/BasicVertexShader.spv");
+    auto fragShaderCode = Helpers::readFile("shaders/BasicFragmentShader.spv");
+
+    std::cout << "VertShader Size: " << vertShaderCode.size() << '\n';
+    std::cout << "FragShader Size: " << fragShaderCode.size() << '\n';
 
 }
 

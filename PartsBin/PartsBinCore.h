@@ -95,6 +95,7 @@ private:
     void createLogicalDevice();
     void createSwapChain();
     void createImageViews();
+    void createGraphicsPipeline();
     void mainLoop();
     void cleanup();
 };
