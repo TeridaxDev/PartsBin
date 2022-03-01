@@ -93,9 +93,8 @@ private:
 
     void initWindow();
     void createInstance();
-    void initVulkan();
     void createSurface();
-    void pickPhysicalDevice();
+    void pickPhysicalDevice(); //TODO: Pick the BEST GPU, not just any
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
     VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
@@ -112,6 +111,7 @@ private:
     //This might need to be public?
     void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
+    void initVulkan();
     void mainLoop();
     void drawFrame();
     void cleanup();
