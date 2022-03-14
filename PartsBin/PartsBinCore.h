@@ -94,7 +94,7 @@ private:
     void initWindow();
     void createInstance();
     void createSurface();
-    void pickPhysicalDevice(); //TODO: Pick the BEST GPU, not just any
+    void pickPhysicalDevice(); //TODO: Pick the BEST GPU, not just any viable
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
     VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
