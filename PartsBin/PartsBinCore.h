@@ -30,6 +30,8 @@ public:
         cleanup();
     }
 
+    bool frameBufferResized = false;
+
 private:
 
     const uint32_t WIDTH = 800;
@@ -49,6 +51,7 @@ private:
 #else
     const bool enableValidationLayers = true;
 #endif
+    const int MAX_FRAMES_IN_FLIGHT = 2;
 
     GLFWwindow* window;
     VkInstance instance;
@@ -64,11 +67,13 @@ private:
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
     VkCommandPool commandPool;
-    VkCommandBuffer commandBuffer;
+    uint32_t currentFrame = 0;
 
-    VkSemaphore imageAvailableSemaphore;
-    VkSemaphore renderFinishedSemaphore;
-    VkFence inFlightFence;
+    std::vector<VkCommandBuffer> commandBuffers;
+    std::vector<VkSemaphore> imageAvailableSemaphores;
+    std::vector<VkSemaphore> renderFinishedSemaphores;
+    std::vector<VkFence> inFlightFences;
+
 
     std::vector<VkImage> swapChainImages;
     std::vector<VkImageView> swapChainImageViews;
@@ -90,7 +95,8 @@ private:
     void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
     VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
     void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
-
+    
+    //Process
     void initWindow();
     void createInstance();
     void createSurface();
@@ -105,7 +111,7 @@ private:
     void createGraphicsPipeline();
     void createFrameBuffers();
     void createCommandPool();
-    void createCommandBuffer();
+    void createCommandBuffers();
     void createSyncObjects();
 
     //This might need to be public?
@@ -122,5 +128,8 @@ private:
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
     VkShaderModule createShaderModule(const std::vector<char>& code);
+    void cleanupSwapChain();
+    void recreateSwapChain();
+    static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 };
