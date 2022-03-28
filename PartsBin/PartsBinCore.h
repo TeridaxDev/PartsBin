@@ -53,6 +53,11 @@ private:
 #endif
     const int MAX_FRAMES_IN_FLIGHT = 2;
 
+    //FPS counting
+    float lastTime;
+    int nbFrames;
+
+    //Vulkan
     GLFWwindow* window;
     VkInstance instance;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -123,6 +128,7 @@ private:
     void cleanup();
 
     //Helpers
+    void showFPS(GLFWwindow* pWindow);
     bool isDeviceSuitable(VkPhysicalDevice device);
     bool checkDeviceExtensionSupport(VkPhysicalDevice device);
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);

@@ -1,5 +1,6 @@
 #include "PartsBinCore.h"
 
+#include <sstream>
 #include <stdexcept>
 #include <iostream>
 #include <map>
@@ -712,6 +713,26 @@ void PartsBinApp::createSyncObjects()
         }
 }
 
+void PartsBinApp::showFPS(GLFWwindow* pWindow)
+{
+    // Measure speed
+    double currentTime = glfwGetTime();
+    double delta = currentTime - lastTime;
+    nbFrames++;
+    if (delta >= 1.0) {
+
+        double fps = double(nbFrames) / delta;
+
+        std::stringstream ss;
+        ss << "The Spare Parts Bin" << " [" << fps << " FPS]";
+
+        glfwSetWindowTitle(pWindow, ss.str().c_str());
+
+        nbFrames = 0;
+        lastTime = currentTime;
+    }
+}
+
 bool PartsBinApp::isDeviceSuitable(VkPhysicalDevice device)
 {
     QueueFamilyIndices indices = findQueueFamilies(device);
@@ -917,6 +938,7 @@ void PartsBinApp::drawFrame()
 
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
+    showFPS(window);
 }
 
 void PartsBinApp::cleanup()
