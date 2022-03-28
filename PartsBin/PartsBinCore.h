@@ -128,7 +128,7 @@ private:
     void cleanup();
 
     //Helpers
-    void showFPS(GLFWwindow* pWindow);
+    void showFPS();
     bool isDeviceSuitable(VkPhysicalDevice device);
     bool checkDeviceExtensionSupport(VkPhysicalDevice device);
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);

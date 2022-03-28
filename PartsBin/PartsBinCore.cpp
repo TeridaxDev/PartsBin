@@ -713,9 +713,9 @@ void PartsBinApp::createSyncObjects()
         }
 }
 
-void PartsBinApp::showFPS(GLFWwindow* pWindow)
+void PartsBinApp::showFPS()
 {
-    // Measure speed
+    // Credit: https://stackoverflow.com/questions/18412120/displaying-fps-in-glfw-window-title
     double currentTime = glfwGetTime();
     double delta = currentTime - lastTime;
     nbFrames++;
@@ -726,7 +726,7 @@ void PartsBinApp::showFPS(GLFWwindow* pWindow)
         std::stringstream ss;
         ss << "The Spare Parts Bin" << " [" << fps << " FPS]";
 
-        glfwSetWindowTitle(pWindow, ss.str().c_str());
+        glfwSetWindowTitle(window, ss.str().c_str());
 
         nbFrames = 0;
         lastTime = currentTime;
@@ -938,7 +938,7 @@ void PartsBinApp::drawFrame()
 
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
-    showFPS(window);
+    showFPS();
 }
 
 void PartsBinApp::cleanup()
