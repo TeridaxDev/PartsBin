@@ -162,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="PartsBinCore.h" />
+    <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Shaders\BasicFragmentShader.frag">

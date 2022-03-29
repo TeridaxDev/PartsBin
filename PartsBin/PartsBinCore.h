@@ -3,6 +3,9 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 //#include <vulkan/vulkan.h> Replaced by GLFW
+
+#include  "Vertex.h"
+
 #include <vector>
 #include <optional>
 
@@ -74,6 +77,8 @@ private:
     VkCommandPool commandPool;
     uint32_t currentFrame = 0;
 
+    VkBuffer vertexBuffer;
+    VkDeviceMemory vertexBufferMemory;
     std::vector<VkCommandBuffer> commandBuffers;
     std::vector<VkSemaphore> imageAvailableSemaphores;
     std::vector<VkSemaphore> renderFinishedSemaphores;
@@ -86,7 +91,11 @@ private:
 
     VkDebugUtilsMessengerEXT debugMessenger;
 
-
+    const std::vector<Vertex> debugTriangleVertices = {
+    {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+    {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+    {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+    };
 
 
     bool checkValidationLayerSupport();
@@ -106,6 +115,7 @@ private:
     void createInstance();
     void createSurface();
     void pickPhysicalDevice(); //TODO: Pick the BEST GPU, not just any viable
+    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties); // Query type of VRAM/whatever that's on the GPU
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
     VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
@@ -121,6 +131,7 @@ private:
 
     //This might need to be public?
     void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+    void createVertexBuffer();
 
     void initVulkan();
     void mainLoop();
