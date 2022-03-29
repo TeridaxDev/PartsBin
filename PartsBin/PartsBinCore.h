@@ -131,7 +131,9 @@ private:
 
     //This might need to be public?
     void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
-    void createVertexBuffer();
+    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+    void createVertexBuffer(); //!!!! -- Vertex Buffer code needs to be refactored. We should NOT be calling vkAllocateMemory() for every buffer. Pool all relevant vertex buffers before sending to GPU. https://vulkan-tutorial.com/en/Vertex_buffers/Staging_buffer
+    void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size); //Uses the command pool, might want to make a new one for superfluous commands like this. Use flag VK_COMMAND_POOL_CREATE_TRANSIENT_BIT
 
     void initVulkan();
     void mainLoop();
