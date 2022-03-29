@@ -79,6 +79,8 @@ private:
 
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
+    VkBuffer indexBuffer;
+    VkDeviceMemory indexBufferMemory;
     std::vector<VkCommandBuffer> commandBuffers;
     std::vector<VkSemaphore> imageAvailableSemaphores;
     std::vector<VkSemaphore> renderFinishedSemaphores;
@@ -92,9 +94,14 @@ private:
     VkDebugUtilsMessengerEXT debugMessenger;
 
     const std::vector<Vertex> debugTriangleVertices = {
-    {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-    {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-    {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+    };
+
+    const std::vector<uint16_t> debugTriangleIndices = {
+        0, 1, 2, 2, 3, 0
     };
 
 
@@ -133,6 +140,7 @@ private:
     void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
     void createVertexBuffer(); //!!!! -- Vertex Buffer code needs to be refactored. We should NOT be calling vkAllocateMemory() for every buffer. Pool all relevant vertex buffers before sending to GPU. https://vulkan-tutorial.com/en/Vertex_buffers/Staging_buffer
+    void createIndexBuffer(); //Driver developers also recommend you store Vertex and Index drivers into one VkBuffer & use offsets. Misery
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size); //Uses the command pool, might want to make a new one for superfluous commands like this. Use flag VK_COMMAND_POOL_CREATE_TRANSIENT_BIT
 
     void initVulkan();
