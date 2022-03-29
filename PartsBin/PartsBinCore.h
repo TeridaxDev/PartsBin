@@ -24,6 +24,13 @@ struct SwapChainSupportDetails {
     std::vector <VkPresentModeKHR> presentModes;
 };
 
+//Obviously, move this to the camera class at some point
+struct UniformBufferObject {
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 proj;
+};
+
 class PartsBinApp {
 public:
     void run() {
@@ -72,6 +79,7 @@ private:
     VkFormat swapChainImageFormat;
     VkExtent2D swapChainExtent;
     VkRenderPass renderPass;
+    VkDescriptorSetLayout descriptorSetLayout;
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
     VkCommandPool commandPool;
@@ -81,6 +89,10 @@ private:
     VkDeviceMemory vertexBufferMemory;
     VkBuffer indexBuffer;
     VkDeviceMemory indexBufferMemory;
+    VkDescriptorPool descriptorPool;
+    std::vector<VkDescriptorSet> descriptorSets;
+    std::vector<VkBuffer> uniformBuffers;
+    std::vector<VkDeviceMemory> uniformBuffersMemory;
     std::vector<VkCommandBuffer> commandBuffers;
     std::vector<VkSemaphore> imageAvailableSemaphores;
     std::vector<VkSemaphore> renderFinishedSemaphores;
@@ -130,6 +142,7 @@ private:
     void createSwapChain();
     void createImageViews();
     void createRenderPass();
+    void createDescriptorSetLayout();
     void createGraphicsPipeline();
     void createFrameBuffers();
     void createCommandPool();
@@ -141,6 +154,9 @@ private:
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
     void createVertexBuffer(); //!!!! -- Vertex Buffer code needs to be refactored. We should NOT be calling vkAllocateMemory() for every buffer. Pool all relevant vertex buffers before sending to GPU. https://vulkan-tutorial.com/en/Vertex_buffers/Staging_buffer
     void createIndexBuffer(); //Driver developers also recommend you store Vertex and Index drivers into one VkBuffer & use offsets. Misery
+    void createUniformBuffers(); //UBOs are less efficient than Push Constants but can handle more data (or might be faster at it? idk)
+    void createDescriptorPool();
+    void createDescriptorSets();
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size); //Uses the command pool, might want to make a new one for superfluous commands like this. Use flag VK_COMMAND_POOL_CREATE_TRANSIENT_BIT
 
     void initVulkan();
@@ -158,5 +174,8 @@ private:
     void cleanupSwapChain();
     void recreateSwapChain();
     static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
+
+    //This goes somewhere else. Camera class? Transform class? Who cares.
+    void updateUniformBuffer(uint32_t currentImage);
 
 };
