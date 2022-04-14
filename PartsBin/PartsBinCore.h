@@ -103,13 +103,19 @@ private:
     std::vector<VkImageView> swapChainImageViews;
     std::vector<VkFramebuffer> swapChainFramebuffers;
 
+    //One of each of these four resources for every texture loaded into memory
+    VkImage textureImage;
+    VkDeviceMemory textureImageMemory;
+    VkImageView textureImageView; //textures are accessed through imageviews like in dx11
+    VkSampler textureSampler; //we could probably reuse these for multiple textures, actually.
+
     VkDebugUtilsMessengerEXT debugMessenger;
 
     const std::vector<Vertex> debugTriangleVertices = {
-    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
     };
 
     const std::vector<uint16_t> debugTriangleIndices = {
@@ -140,7 +146,7 @@ private:
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
     void createLogicalDevice();
     void createSwapChain();
-    void createImageViews();
+    void createImageViews(); //swapchain image views
     void createRenderPass();
     void createDescriptorSetLayout();
     void createGraphicsPipeline();
@@ -158,6 +164,7 @@ private:
     void createDescriptorPool();
     void createDescriptorSets();
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size); //Uses the command pool, might want to make a new one for superfluous commands like this. Use flag VK_COMMAND_POOL_CREATE_TRANSIENT_BIT
+
 
     void initVulkan();
     void mainLoop();
@@ -177,5 +184,26 @@ private:
 
     //This goes somewhere else. Camera class? Transform class? Who cares.
     void updateUniformBuffer(uint32_t currentImage);
+    
+
+
+
+
+    //This is how we load an image in prep for a texture
+    //These should both be modified to be accessible
+    void createTextureImage();
+    void createTextureImageView();
+    void createTextureSampler();
+
+protected:
+    //Public function for making textures
+    void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+    VkImageView createImageView(VkImage image, VkFormat format);
+    void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+    void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+
+    //Temp command buffer alloc and dealloc. Also submits the command buffer to the graphics pipeline for rendering on dealloc
+    VkCommandBuffer beginSingleTimeCommands();
+    void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
 };
