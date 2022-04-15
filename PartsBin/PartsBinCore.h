@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <optional>
+#include <string>
 
 struct QueueFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
@@ -85,10 +86,6 @@ private:
     VkCommandPool commandPool;
     uint32_t currentFrame = 0;
 
-    VkBuffer vertexBuffer;
-    VkDeviceMemory vertexBufferMemory;
-    VkBuffer indexBuffer;
-    VkDeviceMemory indexBufferMemory;
     VkDescriptorPool descriptorPool;
     std::vector<VkDescriptorSet> descriptorSets;
     std::vector<VkBuffer> uniformBuffers;
@@ -112,25 +109,17 @@ private:
     VkImageView textureImageView; //textures are accessed through imageviews like in dx11
     VkSampler textureSampler; //we could probably reuse these for multiple textures, actually.
 
+    std::vector<Vertex> vertices;
+    std::vector<uint32_t> indices;
+    VkBuffer vertexBuffer;
+    VkDeviceMemory vertexBufferMemory;
+    VkBuffer indexBuffer;
+    VkDeviceMemory indexBufferMemory;
+
     VkDebugUtilsMessengerEXT debugMessenger;
 
-    const std::vector<Vertex> debugTriangleVertices = {
-    {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-    {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-    {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-    {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-
-    {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-    {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-    {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
-    };
-
-    const std::vector<uint16_t> debugTriangleIndices = {
-       0, 1, 2, 2, 3, 0,
-        4, 5, 6, 6, 7, 4
-    };
-
+    const std::string MODEL_PATH = "models/viking_room.obj";
+    const std::string TEXTURE_PATH = "textures/viking_room.png";
 
     bool checkValidationLayerSupport();
     std::vector<const char*> getRequiredExtensions();
@@ -174,6 +163,7 @@ private:
     void createDescriptorPool();
     void createDescriptorSets();
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size); //Uses the command pool, might want to make a new one for superfluous commands like this. Use flag VK_COMMAND_POOL_CREATE_TRANSIENT_BIT
+    void loadModel();
 
 
     void initVulkan();
