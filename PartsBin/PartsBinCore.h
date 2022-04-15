@@ -118,8 +118,8 @@ private:
 
     VkDebugUtilsMessengerEXT debugMessenger;
 
-    const std::string MODEL_PATH = "models/viking_room.obj";
-    const std::string TEXTURE_PATH = "textures/viking_room.png";
+    const std::string MODEL_PATH = "models/Maxilos_Mask.obj";
+    const std::string TEXTURE_PATH = "textures/Maxilos_Mask.png";
 
     bool checkValidationLayerSupport();
     std::vector<const char*> getRequiredExtensions();
