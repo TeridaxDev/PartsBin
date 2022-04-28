@@ -238,9 +238,19 @@ void PartsBinApp::initVulkan()
     createTextureImage();
     createTextureImageView();
     createTextureSampler();
-    loadModel();
-    createVertexBuffer();
-    createIndexBuffer();
+
+    verticesList.push_back(std::vector<Vertex>());
+    indicesList.push_back(std::vector<uint32_t>());
+    loadModel(MODEL_PATHS[0], &verticesList[0], &indicesList[0]);
+    createVertexBuffer(&verticesList[0]);
+    createIndexBuffer(&indicesList[0]);
+
+    verticesList.push_back(std::vector<Vertex>());
+    indicesList.push_back(std::vector<uint32_t>());
+    loadModel(MODEL_PATHS[1], &verticesList[1], &indicesList[1]);
+    createVertexBuffer(&verticesList[1]);
+    createIndexBuffer(&indicesList[1]);
+
     createUniformBuffers();
     createDescriptorPool();
     createDescriptorSets();
@@ -552,9 +562,12 @@ void PartsBinApp::createDescriptorSetLayout()
 
 }
 
-void PartsBinApp::createVertexBuffer()
+void PartsBinApp::createVertexBuffer(std::vector<Vertex>* vertices)
 {
-    VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+    VkBuffer vertexBuffer;
+    VkDeviceMemory vertexBufferMemory;
+
+    VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices->size();
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
@@ -562,7 +575,7 @@ void PartsBinApp::createVertexBuffer()
 
     void* data;
     vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, vertices.data(), (size_t)bufferSize);
+    memcpy(data, vertices->data(), (size_t)bufferSize);
     vkUnmapMemory(device, stagingBufferMemory);
 
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
@@ -571,11 +584,17 @@ void PartsBinApp::createVertexBuffer()
 
     vkDestroyBuffer(device, stagingBuffer, nullptr);
     vkFreeMemory(device, stagingBufferMemory, nullptr);
+
+    vertexBuffers.push_back(vertexBuffer);
+    vertexBufferMemories.push_back(vertexBufferMemory);
 }
 
-void PartsBinApp::createIndexBuffer()
+void PartsBinApp::createIndexBuffer(std::vector<uint32_t>* indices)
 {
-    VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+    VkBuffer indexBuffer;
+    VkDeviceMemory indexBufferMemory;
+
+    VkDeviceSize bufferSize = sizeof(indices[0]) * indices->size();
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
@@ -583,7 +602,7 @@ void PartsBinApp::createIndexBuffer()
 
     void* data;
     vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, indices.data(), (size_t)bufferSize);
+    memcpy(data, indices->data(), (size_t)bufferSize);
     vkUnmapMemory(device, stagingBufferMemory);
 
     createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
@@ -592,6 +611,9 @@ void PartsBinApp::createIndexBuffer()
 
     vkDestroyBuffer(device, stagingBuffer, nullptr);
     vkFreeMemory(device, stagingBufferMemory, nullptr);
+
+    indexBuffers.push_back(indexBuffer);
+    indexBufferMemories.push_back(indexBufferMemory);
 }
 
 void PartsBinApp::createUniformBuffers()
@@ -684,14 +706,14 @@ void PartsBinApp::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSiz
 
 }
 
-void PartsBinApp::loadModel()
+void PartsBinApp::loadModel(std::string modelPath, std::vector<Vertex>* vertices, std::vector<uint32_t>* indices)
 {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
     std::string warn, err;
 
-    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, MODEL_PATH.c_str())) {
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, modelPath.c_str())) {
         throw std::runtime_error(warn + err);
     }
 
@@ -715,11 +737,11 @@ void PartsBinApp::loadModel()
             vertex.color = { 1.0f, 1.0f, 1.0f };
 
             if (uniqueVertices.count(vertex) == 0) {
-                uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
-                vertices.push_back(vertex);
+                uniqueVertices[vertex] = static_cast<uint32_t>(vertices->size());
+                vertices->push_back(vertex);
             }
 
-            indices.push_back(uniqueVertices[vertex]);
+            indices->push_back(uniqueVertices[vertex]);
         }
     }
 }
@@ -1473,15 +1495,19 @@ void PartsBinApp::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t im
 
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
-    VkBuffer vertexBuffers[] = { vertexBuffer };
+
     VkDeviceSize offsets[] = { 0 };
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-
-    vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
-
     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
+    for(int i = 0; i < vertexBuffers.size(); i++)
+    {
 
-    vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+        vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vertexBuffers[i], offsets); //TODO : Small optimization, this can probably be outside the for loop since it takes an array
+        vkCmdBindIndexBuffer(commandBuffer, indexBuffers[i], 0, VK_INDEX_TYPE_UINT32);
+        
+        vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesList[i].size()), 1, 0, 0, 0);
+
+    }
+
 
     vkCmdEndRenderPass(commandBuffer);
 
@@ -1603,11 +1629,15 @@ void PartsBinApp::cleanup()
 
     vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 
-    vkDestroyBuffer(device, indexBuffer, nullptr);
-    vkFreeMemory(device, indexBufferMemory, nullptr);
+    for (int i = 0; i < indexBuffers.size(); i++)
+        vkDestroyBuffer(device, indexBuffers[i], nullptr);
+    for (int i = 0; i < indexBufferMemories.size(); i++)
+        vkFreeMemory(device, indexBufferMemories[i], nullptr);
 
-    vkDestroyBuffer(device, vertexBuffer, nullptr);
-    vkFreeMemory(device, vertexBufferMemory, nullptr);
+    for (int i = 0; i < vertexBuffers.size(); i++)
+        vkDestroyBuffer(device, vertexBuffers[i], nullptr);
+    for (int i = 0; i < vertexBufferMemories.size(); i++)
+        vkFreeMemory(device, vertexBufferMemories[i], nullptr);
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);

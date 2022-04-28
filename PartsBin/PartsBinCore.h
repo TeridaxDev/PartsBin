@@ -109,16 +109,16 @@ private:
     VkImageView textureImageView; //textures are accessed through imageviews like in dx11
     VkSampler textureSampler; //we could probably reuse these for multiple textures, actually.
 
-    std::vector<Vertex> vertices;
-    std::vector<uint32_t> indices;
-    VkBuffer vertexBuffer;
-    VkDeviceMemory vertexBufferMemory;
-    VkBuffer indexBuffer;
-    VkDeviceMemory indexBufferMemory;
+    std::vector<std::vector<Vertex>> verticesList;
+    std::vector<std::vector<uint32_t>> indicesList;
+    std::vector<VkBuffer> vertexBuffers;
+    std::vector<VkDeviceMemory> vertexBufferMemories;
+    std::vector<VkBuffer> indexBuffers;
+    std::vector<VkDeviceMemory> indexBufferMemories;
 
     VkDebugUtilsMessengerEXT debugMessenger;
 
-    const std::string MODEL_PATH = "models/Maxilos_Mask.obj";
+    const std::string MODEL_PATHS[2] = { "models/Maxilos_Mask.obj", "models/viking_room.obj" };
     const std::string TEXTURE_PATH = "textures/Maxilos_Mask.png";
 
     bool checkValidationLayerSupport();
@@ -157,13 +157,10 @@ private:
     //This might need to be public?
     void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-    void createVertexBuffer(); //!!!! -- Vertex Buffer code needs to be refactored. We should NOT be calling vkAllocateMemory() for every buffer. Pool all relevant vertex buffers before sending to GPU. https://vulkan-tutorial.com/en/Vertex_buffers/Staging_buffer
-    void createIndexBuffer(); //Driver developers also recommend you store Vertex and Index drivers into one VkBuffer & use offsets. Misery
     void createUniformBuffers(); //UBOs are less efficient than Push Constants but can handle more data (or might be faster at it? idk)
     void createDescriptorPool();
     void createDescriptorSets();
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size); //Uses the command pool, might want to make a new one for superfluous commands like this. Use flag VK_COMMAND_POOL_CREATE_TRANSIENT_BIT
-    void loadModel();
 
 
     void initVulkan();
@@ -196,6 +193,11 @@ private:
     void createTextureSampler();
 
 protected:
+    //STuff for making models
+    void loadModel(std::string modelPath, std::vector<Vertex>* vertices, std::vector<uint32_t>* indices); //Writes into a Vector, so returns void
+    void createVertexBuffer(std::vector<Vertex>* vertices); //!!!! -- Vertex Buffer code needs to be refactored. We should NOT be calling vkAllocateMemory() for every buffer. Pool all relevant vertex buffers before sending to GPU. https://vulkan-tutorial.com/en/Vertex_buffers/Staging_buffer
+    void createIndexBuffer(std::vector<uint32_t>* indices); //Driver developers also recommend you store Vertex and Index drivers into one VkBuffer & use offsets. Misery
+    
     //Public function for making textures
     void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
     VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
