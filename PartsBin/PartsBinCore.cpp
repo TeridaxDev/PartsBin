@@ -567,7 +567,7 @@ void PartsBinApp::createVertexBuffer(std::vector<Vertex>* vertices)
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
 
-    VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices->size();
+    VkDeviceSize bufferSize = sizeof(Vertex) * vertices->size();
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
@@ -594,7 +594,7 @@ void PartsBinApp::createIndexBuffer(std::vector<uint32_t>* indices)
     VkBuffer indexBuffer;
     VkDeviceMemory indexBufferMemory;
 
-    VkDeviceSize bufferSize = sizeof(indices[0]) * indices->size();
+    VkDeviceSize bufferSize = sizeof(uint32_t) * indices->size();
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
